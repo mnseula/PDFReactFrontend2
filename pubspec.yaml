@@ -1,0 +1,32 @@
+name: document_processor
+description: A web app for processing PDF and Office documents
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  http: ^1.1.0
+  provider: ^6.1.1
+  syncfusion_flutter_pdfviewer: ^23.1.36
+  universal_html: ^2.2.1
+  flutter_pdfview: ^1.2.2
+  path_provider: ^2.1.1
+  file_picker: ^5.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+  web:
+    renderer: html
