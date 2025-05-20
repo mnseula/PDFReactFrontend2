@@ -25,4 +25,4 @@ RUN flutter pub get && flutter build web --release
 
 FROM nginx:stable-alpine
 COPY --from=build-env /home/flutter/app/build/web /usr/share/nginx/html
-EXPOSE 80
+EXPOSE 9091
