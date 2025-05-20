@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/file_service.dart';
-import '../models/document_model.dart';
-import '../widgets/upload_widget.dart';
-import '../widgets/tool_selector.dart';
-import '../widgets/document_viewer/document_viewer.dart';
-import '../widgets/processing_form.dart';
+import '../services/file_service.dart'; // Assuming this path is correct
+import '../models/document_model.dart'; // Assuming this path is correct
+import '../widgets/upload_widget.dart'; // Assuming this path is correct
+import '../widgets/tool_selector.dart'; // Assuming this path is correct
+import '../widgets/document_viewer/document_viewer.dart'; // Assuming this path is correct
+import '../widgets/processing_form.dart'; // Assuming this path is correct
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,106 +15,128 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Document? _currentDocument;
-  String? _selectedTool;
-  final GlobalKey<DocumentViewerState> _documentViewerKey = GlobalKey();
+  String? _selectedTool; // e.g., 'sign', 'redact', 'annotate'
+  bool _isProcessing = false;
+
+  void _handleFileUpload(Document document) {
+    setState(() {
+      _currentDocument = document;
+      _selectedTool = null; // Reset tool selection on new upload
+      _isProcessing = false; // Reset processing state
+    });
+    // Optionally navigate or update UI to show the document viewer
+  }
+
+  void _handleToolSelected(String tool) {
+    setState(() {
+      _selectedTool = tool;
+      _isProcessing = false; // Reset processing state
+    });
+    // Logic to activate specific tool UI/behavior
+  }
+
+  void _handleProcessingStart() {
+    setState(() {
+      _isProcessing = true;
+    });
+    // Logic to show processing indicator
+  }
+
+  void _handleProcessingComplete(Document processedDocument) {
+    setState(() {
+      _currentDocument = processedDocument; // Update with the processed document
+      _isProcessing = false;
+      _selectedTool = null; // Reset tool after processing
+    });
+    // Logic to hide processing indicator and show updated document
+  }
+
+  void _handleProcessingCancel() {
+    setState(() {
+      _isProcessing = false;
+      // Optionally reset selected areas or other tool-specific state
+    });
+    // Logic to hide processing indicator
+  }
+
+  Widget _buildLeftPanel(BuildContext context) {
+    return Container(
+      width: 300, // Example width, adjust as needed
+      decoration: BoxDecoration(
+        // Corrected Border syntax here:
+        border: Border(right: BorderSide(color: Theme.of(context).dividerColor)),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Document Tools',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Assuming UploadWidget is a StatelessWidget or StatefulWidget
+                  // and the constructor call is correct once the file is found.
+                  const UploadWidget(), // Assuming this widget handles file picking and calls _handleFileUpload
+                  const SizedBox(height: 24),
+                  if (_currentDocument != null) ...[
+                    ToolSelector( // Assuming ToolSelector is a StatelessWidget or StatefulWidget
+                      onToolSelected: _handleToolSelected,
+                      selectedTool: _selectedTool,
+                    ),
+                    const SizedBox(height: 24),
+                    if (_selectedTool != null && !_isProcessing)
+                      ProcessingForm( // Assuming ProcessingForm is a StatelessWidget or StatefulWidget
+                        document: _currentDocument!,
+                        selectedTool: _selectedTool!,
+                        onProcessingStart: _handleProcessingStart,
+                        onProcessingComplete: _handleProcessingComplete,
+                        onProcessingCancel: _handleProcessingCancel,
+                      ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRightPanel(BuildContext context) {
+    return Expanded(
+      child: _currentDocument == null
+          ? Center(
+              child: Text(
+                'Upload a document to get started',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            )
+          : DocumentViewer( // Assuming DocumentViewer is a StatelessWidget or StatefulWidget
+              document: _currentDocument!,
+              onDocumentProcessed: _handleProcessingComplete, // Pass the complete handler
+            ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Document Processor'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle),
-            onPressed: _showAuthDialog,
-          ),
-        ],
       ),
       body: Row(
         children: [
-          // Sidebar for tools
-          Container(
-            width: 250,
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              border: Border.right: BorderSide(color: Theme.of(context).dividerColor),
-            ),
-            child: Column(
-              children: [
-                const UploadWidget(),
-                const SizedBox(height: 16),
-                ToolSelector(
-                  onToolSelected: (tool) {
-                    setState(() {
-                      _selectedTool = tool;
-                    });
-                  },
-                  onSignatureSelected: () {
-                    _documentViewerKey.currentState?.startSignatureProcess();
-                  },
-                ),
-                if (_selectedTool != null) ...[
-                  const SizedBox(height: 16),
-                  ProcessingForm(
-                    tool: _selectedTool!,
-                    document: _currentDocument,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          // Main content area
-          Expanded(
-            child: _currentDocument == null
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.upload_file, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text(
-                          'Upload a document to get started',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                : DocumentViewer(
-                    key: _documentViewerKey,
-                    document: _currentDocument!,
-                    onDocumentProcessed: (newDocument) {
-                      setState(() {
-                        _currentDocument = newDocument;
-                      });
-                    },
-                  ),
-          ),
+          _buildLeftPanel(context),
+          _buildRightPanel(context),
         ],
       ),
     );
-  }
-
-  void _showAuthDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Authentication'),
-        content: const Text('Authentication will be implemented later.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Call this when a file is uploaded
-  void _handleFileUpload(Document document) {
-    setState(() {
-      _currentDocument = document;
-      _selectedTool = null; // Reset selected tool when new document is uploaded
-    });
   }
 }

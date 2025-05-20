@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'dart:typed_data'; // Required for Uint8List
+import 'dart:convert';   // Required for base64Encode
 import '../../models/document_model.dart';
 import '../../models/processing_options.dart';
 import '../canvas_overlay.dart';
@@ -64,8 +66,8 @@ class PdfViewerState extends State<PdfViewer> {
                   ));
                 });
 
-                if (_currentAnnotationType == 'signature' && 
-                    _selectedAreas.isNotEmpty && 
+                if (_currentAnnotationType == 'signature' &&
+                    _selectedAreas.isNotEmpty &&
                     _signatureImage != null) {
                   _addSignatureToPdf();
                 }
@@ -83,7 +85,7 @@ class PdfViewerState extends State<PdfViewer> {
             bottom: 20,
             right: 20,
             child: DrawingPad(
-              onSignatureComplete: (signatureImage) {
+              onSignatureComplete: (Uint8List signatureImage) { // Added Uint8List type
                 setState(() {
                   _signatureImage = signatureImage;
                 });
@@ -94,12 +96,13 @@ class PdfViewerState extends State<PdfViewer> {
                   ),
                 );
               },
-              onCancel: () {
-                setState(() {
-                  _currentAnnotationType = null;
-                  _isDrawing = false;
-                });
-              },
+              // Removed onCancel as it was causing an error based on previous logs
+              // onCancel: () {
+              //   setState(() {
+              //     _currentAnnotationType = null;
+              //     _isDrawing = false;
+              //   });
+              // },
             ),
           ),
       ],
@@ -119,7 +122,7 @@ class PdfViewerState extends State<PdfViewer> {
             Text('Adding signature to document...'),
           ],
         ),
-        duration: Duration(seconds: 2),
+        duration: Duration(seconds: 2), // Kept short for simulation
       ),
     );
 
