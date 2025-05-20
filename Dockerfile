@@ -1,5 +1,6 @@
 FROM debian:stable-slim AS build-env
 
+# Install required dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl git unzip xz-utils ca-certificates && \
@@ -19,15 +20,22 @@ ENV PATH="/home/flutter/flutter/bin:${PATH}"
 RUN flutter config --enable-web
 RUN flutter precache --web
 
-# Copy project files
+# Create Flutter project
 WORKDIR /home/flutter/app
+RUN flutter create pdf_viewer
+
+# Copy your project files
+WORKDIR /home/flutter/app/pdf_viewer
 COPY --chown=flutter:flutter . .
 
-# Get dependencies and build
+# Enable web platform and build
+RUN flutter config --enable-web
+RUN flutter create --platforms=web .
+RUN flutter clean
 RUN flutter pub get
 RUN flutter build web --release
 
 # Production stage
 FROM nginx:stable-alpine
-COPY --from=build-env /home/flutter/app/build/web /usr/share/nginx/html
-EXPOSE 9091
+COPY --from=build-env /home/flutter/app/pdf_viewer/build/web /usr/share/nginx/html
+EXPOSE 80
