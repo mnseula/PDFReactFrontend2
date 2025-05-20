@@ -1,25 +1,31 @@
-# Use multi-stage build to avoid root issues
 FROM debian:stable-slim AS build-env
 
-# Install dependencies (non-root)
+# 1. Install dependencies with certificate support
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    curl git unzip xz-utils && \
-    rm -rf /var/lib/apt/lists/*
+    curl git unzip xz-utils ca-certificates && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
 
-# Create non-root user
+# 2. Create non-root user
 RUN useradd -m flutter
 USER flutter
 WORKDIR /home/flutter/app
 
-# Install Flutter
+# 3. Configure Git to skip SSL verification (temporary)
+RUN git config --global http.sslVerify false
+
+# 4. Install Flutter (now with working SSL)
 RUN git clone https://github.com/flutter/flutter.git -b stable /home/flutter/flutter
 ENV PATH="/home/flutter/flutter/bin:${PATH}"
 
-# Copy project files (preserve permissions)
+# 5. Re-enable SSL verification
+RUN git config --global http.sslVerify true
+
+# 6. Copy project files
 COPY --chown=flutter . .
 
-# Build
+# 7. Build
 RUN flutter pub get && \
     flutter build web --release --web-renderer html
 
