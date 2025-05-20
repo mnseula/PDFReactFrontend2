@@ -3,34 +3,51 @@ import '../../models/document_model.dart';
 import 'pdf_viewer.dart';
 import 'office_viewer.dart';
 
-class DocumentViewer extends StatelessWidget {
+class DocumentViewer extends StatefulWidget {
   final Document document;
   final Function(Document) onDocumentProcessed;
+  final GlobalKey<DocumentViewerState>? key;
 
   const DocumentViewer({
-    super.key,
+    this.key,
     required this.document,
     required this.onDocumentProcessed,
-  });
+  }) : super(key: key);
+
+  @override
+  DocumentViewerState createState() => DocumentViewerState();
+}
+
+class DocumentViewerState extends State<DocumentViewer> {
+  final GlobalKey _currentViewerKey = GlobalKey();
+
+  void startSignatureProcess() {
+    if (_currentViewerKey.currentState is PdfViewerState) {
+      (_currentViewerKey.currentState as PdfViewerState).startSignatureProcess();
+    }
+    // Add similar handling for other viewer types if needed
+  }
 
   @override
   Widget build(BuildContext context) {
-    switch (document.type) {
+    switch (widget.document.type) {
       case DocumentType.pdf:
         return PdfViewer(
-          document: document,
-          onDocumentProcessed: onDocumentProcessed,
+          key: _currentViewerKey,
+          document: widget.document,
+          onDocumentProcessed: widget.onDocumentProcessed,
         );
       case DocumentType.word:
       case DocumentType.powerpoint:
       case DocumentType.excel:
         return OfficeViewer(
-          document: document,
-          onDocumentProcessed: onDocumentProcessed,
+          key: _currentViewerKey,
+          document: widget.document,
+          onDocumentProcessed: widget.onDocumentProcessed,
         );
       case DocumentType.image:
         return Center(
-          child: Image.network(document.path),
+          child: Image.network(widget.document.path),
         );
       default:
         return const Center(
