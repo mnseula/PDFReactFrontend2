@@ -8,6 +8,18 @@ enum AnnotationType {
   underline
 }
 
+class AnnotationOptions {
+  final AnnotationType type;
+  final Uint8List? signatureData;
+  final String? text;
+  
+  AnnotationOptions({
+    required this.type,
+    this.signatureData,
+    this.text,
+  });
+}
+
 class RectangleArea {
   final double x1, y1, x2, y2;
   final int? pageNumber;
