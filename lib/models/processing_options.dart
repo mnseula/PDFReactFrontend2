@@ -21,6 +21,13 @@ class RectangleArea {
   });
 }
 
+enum AnnotationType {
+  signature,
+  text,
+  highlight,
+  underline
+}
+
 class AnnotationOptions {
   final String type;
   final RectangleArea area;

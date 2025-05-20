@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../services/file_service.dart'; // Assuming this path is correct
-import '../models/document_model.dart'; // Assuming this path is correct
-import '../widgets/upload_widget.dart'; // Assuming this path is correct
-import '../widgets/tool_selector.dart'; // Assuming this path is correct
-import '../widgets/document_viewer/document_viewer.dart'; // Assuming this path is correct
-import '../widgets/processing_form.dart'; // Assuming this path is correct
+import '../../services/file_service.dart';
+import '../../models/document_model.dart';
+import '../widgets/upload_widget.dart';
+import '../widgets/tool_selector.dart';
+import '../widgets/document_viewer/document_viewer.dart';
+import '../widgets/processing_form.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

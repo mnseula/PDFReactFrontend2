@@ -1,8 +1,26 @@
 version: '3.8'
+name: pdf-react-frontend
+
 services:
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdf-viewer-web
     ports:
-      - "9091:9091"
+      - "9091:80"  # Note: Changed to 80 since nginx uses port 80 by default
     env_file: .env
-    restart: unless-stopped
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - pdf-viewer-network
+
+networks:
+  pdf-viewer-network:
+    name: pdf-viewer-network
+    driver: bridge

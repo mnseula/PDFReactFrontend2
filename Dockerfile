@@ -6,23 +6,28 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     update-ca-certificates
 
-RUN useradd -m flutter
+# Create flutter user
+RUN useradd -ms /bin/bash flutter
 USER flutter
-WORKDIR /home/flutter/app
+WORKDIR /home/flutter
 
-RUN git clone https://github.com/flutter/flutter.git -b stable /home/flutter/flutter
+# Clone Flutter
+RUN git clone https://github.com/flutter/flutter.git -b stable
 ENV PATH="/home/flutter/flutter/bin:${PATH}"
 
-RUN flutter config --enable-web && flutter precache --web
+# Configure Flutter for web
+RUN flutter config --enable-web
+RUN flutter precache --web
 
-COPY --chown=flutter . .
+# Copy project files
+WORKDIR /home/flutter/app
+COPY --chown=flutter:flutter . .
 
-RUN if [ ! -d "web" ]; then \
-      flutter create --platforms web .; \
-    fi
+# Get dependencies and build
+RUN flutter pub get
+RUN flutter build web --release
 
-RUN flutter pub get && flutter build web --release
-
+# Production stage
 FROM nginx:stable-alpine
 COPY --from=build-env /home/flutter/app/build/web /usr/share/nginx/html
 EXPOSE 9091

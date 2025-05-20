@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'dart:typed_data'; // Required for Uint8List
-import 'dart:convert';   // Required for base64Encode
-import '../../models/document_model.dart';
-import '../../models/processing_options.dart';
+import 'dart:typed_data';
+import 'dart:convert';
+import '../../../models/document_model.dart';
+import '../../../models/processing_options.dart';
 import '../canvas_overlay.dart';
 import '../drawing_pad.dart';
 
