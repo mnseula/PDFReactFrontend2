@@ -3,6 +3,6 @@ services:
   app:
     build: .
     ports:
-      - "9191:9191"
+      - "9091:9091"
     env_file: .env
     restart: unless-stopped
