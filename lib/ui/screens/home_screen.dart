@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
+import 'dart:io';
 import '../services/file_service.dart';
 import '../models/document_model.dart';
 import '../widgets/upload_widget.dart';
