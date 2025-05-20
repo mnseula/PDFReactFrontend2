@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../models/document_model.dart';
 
 class Document {
   final String id;
