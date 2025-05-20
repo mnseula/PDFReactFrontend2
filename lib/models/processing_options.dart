@@ -1,4 +1,3 @@
-lib/models/processing_options.dart
 import 'dart:typed_data';
 
 enum AnnotationType {
@@ -13,7 +12,7 @@ class AnnotationOptions {
   final Uint8List? signatureData;
   final String? text;
   final RectangleArea? area;
-  
+
   const AnnotationOptions({
     required this.type,
     this.signatureData,
@@ -25,11 +24,11 @@ class AnnotationOptions {
 class RectangleArea {
   final double x1, y1, x2, y2;
   final int? pageNumber;
-  
+
   const RectangleArea({
     required this.x1,
     required this.y1,
-    required this.x2, 
+    required this.x2,
     required this.y2,
     this.pageNumber,
   });

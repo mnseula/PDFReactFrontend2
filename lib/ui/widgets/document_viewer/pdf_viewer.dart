@@ -10,10 +10,9 @@ import '../drawing_pad.dart';
 class PdfViewer extends StatefulWidget {
   final Document document;
   final Function(Document) onDocumentProcessed;
-  final GlobalKey<PdfViewerState>? key;
 
   const PdfViewer({
-    this.key,
+    Key? key,
     required this.document,
     required this.onDocumentProcessed,
   }) : super(key: key);
@@ -23,151 +22,56 @@ class PdfViewer extends StatefulWidget {
 }
 
 class PdfViewerState extends State<PdfViewer> {
-  final PdfViewerController _pdfViewerController = PdfViewerController();
   List<RectangleArea> _selectedAreas = [];
-  bool _isDrawing = false;
-  String? _currentAnnotationType;
   Uint8List? _signatureImage;
-  int? _currentPageNumber;
-
-  void startSignatureProcess() {
-    setState(() {
-      _currentAnnotationType = 'signature';
-      _isDrawing = true;
-      _signatureImage = null;
-      _selectedAreas.clear();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SfPdfViewer.network(
-          widget.document.path,
-          controller: _pdfViewerController,
-          onPageChanged: (PdfPageChangedDetails details) {
-            setState(() {
-              _currentPageNumber = details.newPageNumber;
-            });
-          },
-        ),
-        if (_isDrawing || _currentAnnotationType != null)
-          Positioned.fill(
-            child: CanvasOverlay(
-              onAreaSelected: (area) {
-                setState(() {
-                  _selectedAreas.add(RectangleArea(
-                    x1: area.x1,
-                    y1: area.y1,
-                    x2: area.x2,
-                    y2: area.y2,
-                    pageNumber: _currentPageNumber,
-                  ));
-                });
-
-                if (_currentAnnotationType == 'signature' &&
-                    _selectedAreas.isNotEmpty &&
-                    _signatureImage != null) {
-                  _addSignatureToPdf();
-                }
-              },
-              selectedAreas: _selectedAreas,
-              onClearSelection: () {
-                setState(() {
-                  _selectedAreas.clear();
-                });
-              },
-            ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          SfPdfViewer.network(
+            widget.document.url,
           ),
-        if (_currentAnnotationType == 'signature' && _signatureImage == null)
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: DrawingPad(
-              onSignatureComplete: (Uint8List signatureImage) { // Added Uint8List type
-                setState(() {
-                  _signatureImage = signatureImage;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Signature captured. Now select where to place it.'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              // Removed onCancel as it was causing an error based on previous logs
-              // onCancel: () {
-              //   setState(() {
-              //     _currentAnnotationType = null;
-              //     _isDrawing = false;
-              //   });
-              // },
-            ),
+          CanvasOverlay(
+            onAreaSelected: (area) {
+              setState(() {
+                _selectedAreas.add(area);
+              });
+            },
+            onClearSelection: () {
+              setState(() {
+                _selectedAreas.clear();
+              });
+            },
           ),
-      ],
-    );
-  }
-
-  Future<void> _addSignatureToPdf() async {
-    if (_selectedAreas.isEmpty || _signatureImage == null) return;
-
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    scaffoldMessenger.showSnackBar(
-      const SnackBar(
-        content: Row(
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(width: 10),
-            Text('Adding signature to document...'),
-          ],
-        ),
-        duration: Duration(seconds: 2), // Kept short for simulation
+          if (_signatureImage != null)
+            Image.memory(
+              _signatureImage!,
+              width: 100,
+              height: 100,
+            ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Implement annotation logic
+          final annotation = AnnotationOptions(
+            type: AnnotationType.signature,
+            signatureData: _signatureImage,
+            area: _selectedAreas.isNotEmpty ? _selectedAreas.last : null,
+          );
+          print('Annotation: $annotation');
+        },
+        child: const Icon(Icons.add),
+      ),
+      bottomSheet: DrawingPad(
+        onSignatureComplete: (signature) {
+          setState(() {
+            _signatureImage = signature;
+          });
+        },
       ),
     );
-
-    try {
-      // Create annotation options
-      final annotation = AnnotationOptions(
-        type: AnnotationType.signature,
-        area: _selectedAreas.last,
-        signatureImage: base64Encode(_signatureImage!),
-      );
-
-      // In a real app, you would call your API here:
-      // final processedDoc = await ApiService().processDocument(
-      //   widget.document.id,
-      //   ProcessingOptions(
-      //     operation: 'annotate',
-      //     parameters: annotation.toJson(),
-      //   ),
-      // );
-      // widget.onDocumentProcessed(processedDoc);
-
-      // Simulate API call delay
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Reset signature state
-      setState(() {
-        _signatureImage = null;
-        _selectedAreas.clear();
-        _currentAnnotationType = null;
-        _isDrawing = false;
-      });
-
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Signature added successfully'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Failed to add signature: $e'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
   }
 }
