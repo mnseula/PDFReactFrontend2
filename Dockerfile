@@ -1,40 +1,29 @@
-# Stage 1: Build the Flutter web app
+# Use multi-stage build to avoid root issues
 FROM debian:stable-slim AS build-env
 
-# Install required tools
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    unzip \
-    xz-utils \
-    zip \
-    && rm -rf /var/lib/apt/lists/*
+# Install dependencies (non-root)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl git unzip xz-utils && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m flutter
+USER flutter
+WORKDIR /home/flutter/app
 
 # Install Flutter
-RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/local/flutter
-ENV PATH="$PATH:/usr/local/flutter/bin"
+RUN git clone https://github.com/flutter/flutter.git -b stable /home/flutter/flutter
+ENV PATH="/home/flutter/flutter/bin:${PATH}"
 
-# Set up the app
-WORKDIR /app
-COPY . .
+# Copy project files (preserve permissions)
+COPY --chown=flutter . .
 
-# Get Flutter dependencies
-RUN flutter pub get
+# Build
+RUN flutter pub get && \
+    flutter build web --release --web-renderer html
 
-# Build the Flutter web app
-RUN flutter build web --release --web-renderer html
-
-# Stage 2: Set up the production environment
+# Production stage
 FROM nginx:stable-alpine
-
-# Copy the built app from the previous stage
-COPY --from=build-env /app/build/web /usr/share/nginx/html
-
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
+COPY --from=build-env /home/flutter/app/build/web /usr/share/nginx/html
 EXPOSE 9191
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
