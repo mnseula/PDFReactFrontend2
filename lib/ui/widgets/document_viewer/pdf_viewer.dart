@@ -48,15 +48,22 @@ class PdfViewerState extends State<PdfViewer> {
       body: Stack(
         children: [
           SfPdfViewer.network(
-            widget.document.path, // Changed from url
+            widget.document.path,
             controller: _pdfViewerController,
             enableTextSelection: !_isDrawingMode,
           ),
           if (!_isDrawingMode)
             CanvasOverlay(
-              selectedAreas: const [], // Add default value
-              onAreaSelected: (area) {},
-              onClearSelection: () {},
+              onAreaSelected: (area) {
+                setState(() {
+                  _selectedAreas.add(area);
+                });
+              },
+              onClearSelection: () {
+                setState(() {
+                  _selectedAreas.clear();
+                });
+              },
             ),
           if (_signatureImage != null)
             Positioned(

@@ -27,8 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (file != null) {
       final type = _getDocumentType(file.path);
       final document = Document(
+        id: DateTime.now().millisecondsSinceEpoch.toString(), // Add required id
         name: file.name,
-        path: file.path, // Changed from url
+        path: file.path,
+        size: 0, // Add required size
+        uploadDate: DateTime.now(), // Add required uploadDate
         type: type,
       );
 

@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 
 class DrawingPad extends StatelessWidget {
   final Function(Uint8List) onSignatureComplete;
-  final GlobalKey<SfSignaturePadState> _signaturePadKey = const GlobalKey();
+  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
   
   const DrawingPad({
     super.key,
@@ -14,7 +14,7 @@ class DrawingPad extends StatelessWidget {
 
   Future<void> _handleSave() async {
     final data = await _signaturePadKey.currentState!.toImage();
-    final bytes = await data.toByteData(format: ImageByteFormat.png);
+    final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
     if (bytes != null) {
       onSignatureComplete(bytes.buffer.asUint8List());
     }
