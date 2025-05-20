@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class ToolSelector extends StatelessWidget {
   final Function(String) onToolSelected;
+  final VoidCallback? onSignatureSelected;
 
   const ToolSelector({
     super.key,
     required this.onToolSelected,
+    this.onSignatureSelected,
   });
 
   @override
@@ -17,6 +20,7 @@ class ToolSelector extends StatelessWidget {
           'PDF Tools',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8.0,
           runSpacing: 8.0,
@@ -28,6 +32,7 @@ class ToolSelector extends StatelessWidget {
             _buildToolButton('Annotate', Icons.edit, 'annotate'),
             _buildToolButton('Edit Text', Icons.find_replace, 'edit'),
             _buildToolButton('OCR', Icons.text_snippet, 'ocr'),
+            _buildSignatureButton(),
           ],
         ),
         const SizedBox(height: 16),
@@ -35,6 +40,7 @@ class ToolSelector extends StatelessWidget {
           'Conversion Tools',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8.0,
           runSpacing: 8.0,
@@ -57,6 +63,26 @@ class ToolSelector extends StatelessWidget {
         icon: Icon(icon),
         label: Text(label),
         onPressed: () => onToolSelected(tool),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignatureButton() {
+    return Tooltip(
+      message: 'Signature',
+      child: ElevatedButton.icon(
+        icon: const Icon(Icons.edit),
+        label: const Text('Signature'),
+        onPressed: () {
+          onToolSelected('signature');
+          onSignatureSelected?.call();
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        ),
       ),
     );
   }
