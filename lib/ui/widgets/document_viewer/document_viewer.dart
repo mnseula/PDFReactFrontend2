@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/document_model.dart'; // Assuming this path is correct
-// Import the specific state class for the GlobalKey
-import 'package:c:\Users\minseula\code\PDFReactFrontend2\lib\ui\widgets\document_viewer\pdf_viewer.dart'; // Assuming PdfViewerState is defined here
+// Import the specific state class for the GlobalKey using a relative path
+import 'pdf_viewer.dart'; // Assuming PdfViewerState is defined here
 
 class DocumentViewer extends StatefulWidget {
   final Document document; // Assuming Document is defined in document_model.dart
