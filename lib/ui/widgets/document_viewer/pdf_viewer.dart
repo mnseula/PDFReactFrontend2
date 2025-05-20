@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:typed_data';
-import 'dart:convert';
-import '../../../models/document_model.dart';
-import '../../../models/processing_options.dart';
-import '../canvas_overlay.dart';
-import '../drawing_pad.dart';
+import 'package:document_processor/models/document_model.dart';
+import 'package:document_processor/models/processing_options.dart';
+import 'package:document_processor/ui/widgets/canvas_overlay.dart';
+import 'package:document_processor/ui/widgets/drawing_pad.dart';
 
 class PdfViewer extends StatefulWidget {
   final Document document;
@@ -22,56 +21,109 @@ class PdfViewer extends StatefulWidget {
 }
 
 class PdfViewerState extends State<PdfViewer> {
+  final PdfViewerController _pdfViewerController = PdfViewerController();
   List<RectangleArea> _selectedAreas = [];
   Uint8List? _signatureImage;
+  bool _isDrawingMode = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.document.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: _selectedAreas.isEmpty ? null : _undoLastSelection,
+          ),
+          IconButton(
+            icon: Icon(Icons.draw, 
+              color: _isDrawingMode ? Colors.blue : null
+            ),
+            onPressed: _toggleDrawingMode,
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           SfPdfViewer.network(
             widget.document.url,
+            controller: _pdfViewerController,
+            enableTextSelection: !_isDrawingMode,
           ),
-          CanvasOverlay(
-            onAreaSelected: (area) {
-              setState(() {
-                _selectedAreas.add(area);
-              });
-            },
-            onClearSelection: () {
-              setState(() {
-                _selectedAreas.clear();
-              });
-            },
-          ),
+          if (!_isDrawingMode)
+            CanvasOverlay(
+              selectedAreas: _selectedAreas,
+              onAreaSelected: (area) {
+                setState(() {
+                  _selectedAreas.add(area);
+                });
+              },
+              onClearSelection: () {
+                setState(() {
+                  _selectedAreas.clear();
+                });
+              },
+            ),
           if (_signatureImage != null)
-            Image.memory(
-              _signatureImage!,
-              width: 100,
-              height: 100,
+            Positioned(
+              left: _selectedAreas.lastOrNull?.x1 ?? 0,
+              top: _selectedAreas.lastOrNull?.y1 ?? 0,
+              child: Image.memory(
+                _signatureImage!,
+                width: 100,
+                height: 50,
+              ),
             ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Implement annotation logic
-          final annotation = AnnotationOptions(
-            type: AnnotationType.signature,
-            signatureData: _signatureImage,
-            area: _selectedAreas.isNotEmpty ? _selectedAreas.last : null,
-          );
-          print('Annotation: $annotation');
-        },
-        child: const Icon(Icons.add),
+        onPressed: _processAnnotations,
+        child: const Icon(Icons.save),
       ),
-      bottomSheet: DrawingPad(
+      bottomSheet: _isDrawingMode ? DrawingPad(
         onSignatureComplete: (signature) {
           setState(() {
             _signatureImage = signature;
+            _isDrawingMode = false;
           });
         },
-      ),
+      ) : null,
     );
+  }
+
+  void _undoLastSelection() {
+    setState(() {
+      _selectedAreas.removeLast();
+    });
+  }
+
+  void _toggleDrawingMode() {
+    setState(() {
+      _isDrawingMode = !_isDrawingMode;
+    });
+  }
+
+  void _processAnnotations() {
+    final annotation = AnnotationOptions(
+      type: AnnotationType.signature,
+      signatureData: _signatureImage,
+      area: _selectedAreas.isNotEmpty ? _selectedAreas.last : null,
+    );
+    
+    final processedDocument = Document(
+      name: widget.document.name,
+      url: widget.document.url,
+      type: widget.document.type,
+      annotations: [...?widget.document.annotations, annotation],
+    );
+    
+    widget.onDocumentProcessed(processedDocument);
+  }
+
+  @override
+  void dispose() {
+    _pdfViewerController.dispose();
+    super.dispose();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
-import '../../models/document_model.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:document_processor/models/document_model.dart';
 
 class PdfViewScreen extends StatelessWidget {
   final Document document;
@@ -17,19 +17,23 @@ class PdfViewScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(document.name),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: () => onDocumentProcessed(document),
+          ),
+        ],
       ),
-      body: PDFView(
-        filePath: document.path,
-        enableSwipe: true,
-        swipeHorizontal: false,
-        autoSpacing: true,
-        pageFling: true,
-        onError: (error) {
-          print(error.toString());
+      body: SfPdfViewer.network(
+        document.url,
+        onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${details.error}')),
+          );
         },
-        onPageError: (page, error) {
-          print('$page: ${error.toString()}');
-        },
+        enableDoubleTapZooming: true,
+        enableTextSelection: true,
+        pageSpacing: 4,
       ),
     );
   }

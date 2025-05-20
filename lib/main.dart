@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'ui/screens/home_screen.dart';
-import 'ui/themes/app_theme.dart';
+import 'package:document_processor/ui/screens/home_screen.dart';
+import 'package:document_processor/ui/themes/app_theme.dart';
 
 void main() {
   setUrlStrategy(PathUrlStrategy());

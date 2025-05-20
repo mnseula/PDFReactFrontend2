@@ -19,6 +19,21 @@ class _DrawingPadState extends State<DrawingPad> {
   List<Offset> _points = [];
   final GlobalKey _canvasKey = GlobalKey();
 
+  Future<void> _captureSignature() async {
+    try {
+      final boundary = _canvasKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return;
+
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData != null) {
+        widget.onSignatureComplete(byteData.buffer.asUint8List());
+      }
+    } catch (e) {
+      debugPrint('Error capturing signature: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -74,23 +89,6 @@ class _DrawingPadState extends State<DrawingPad> {
       ],
     );
   }
-
-  Future<void> _captureSignature() async {
-    try {
-      final boundary = _canvasKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
-      if (boundary == null) return;
-
-      final image = await boundary.toImage();
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return;
-
-      final pngBytes = byteData.buffer.asUint8List();
-      widget.onSignatureComplete(pngBytes);
-    } catch (e) {
-      print('Error capturing signature: $e');
-    }
-  }
 }
 
 class _SignaturePainter extends CustomPainter {
@@ -102,8 +100,8 @@ class _SignaturePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.black
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 3.0;
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
 
     for (int i = 0; i < points.length - 1; i++) {
       if (points[i] != null && points[i + 1] != null) {
@@ -113,5 +111,5 @@ class _SignaturePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(_SignaturePainter oldDelegate) => true;
 }

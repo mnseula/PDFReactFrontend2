@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:document_processor/models/tool_model.dart';
 
 class ToolSelector extends StatelessWidget {
   final Function(String) onToolSelected;
@@ -65,6 +65,9 @@ class ToolSelector extends StatelessWidget {
         onPressed: () => onToolSelected(tool),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       ),
     );
@@ -72,16 +75,17 @@ class ToolSelector extends StatelessWidget {
 
   Widget _buildSignatureButton() {
     return Tooltip(
-      message: 'Signature',
+      message: 'Add Signature',
       child: ElevatedButton.icon(
-        icon: const Icon(Icons.edit),
+        icon: const Icon(Icons.draw),
         label: const Text('Signature'),
-        onPressed: () {
-          onToolSelected('signature');
-          onSignatureSelected?.call();
-        },
+        onPressed: onSignatureSelected,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          primary: Colors.blue,
         ),
       ),
     );

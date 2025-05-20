@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/document_model.dart';
+import 'package:document_processor/models/document_model.dart';
 
 class ProcessingForm extends StatelessWidget {
   final Document document;

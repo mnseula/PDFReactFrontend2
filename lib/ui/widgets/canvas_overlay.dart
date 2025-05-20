@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/processing_options.dart';
+import 'package:document_processor/models/processing_options.dart';
 
 class CanvasOverlay extends StatefulWidget {
   final Function(RectangleArea) onAreaSelected;
@@ -12,23 +12,43 @@ class CanvasOverlay extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CanvasOverlayState createState() => _CanvasOverlayState();
+  State<CanvasOverlay> createState() => _CanvasOverlayState();
 }
 
 class _CanvasOverlayState extends State<CanvasOverlay> {
-  List<RectangleArea> _selectedAreas = [];
+  final List<RectangleArea> _selectedAreas = [];
+  Offset? _startPoint;
+  Offset? _currentPoint;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onPanDown: (details) {
-        // Handle pan start
+        setState(() {
+          _startPoint = details.localPosition;
+          _currentPoint = _startPoint;
+        });
       },
       onPanUpdate: (details) {
-        // Handle pan update
+        setState(() {
+          _currentPoint = details.localPosition;
+        });
       },
       onPanEnd: (details) {
-        // Handle pan end
+        if (_startPoint != null && _currentPoint != null) {
+          final area = RectangleArea(
+            x1: _startPoint!.dx,
+            y1: _startPoint!.dy,
+            x2: _currentPoint!.dx,
+            y2: _currentPoint!.dy,
+          );
+          widget.onAreaSelected(area);
+          _selectedAreas.add(area);
+        }
+        setState(() {
+          _startPoint = null;
+          _currentPoint = null;
+        });
       },
       child: CustomPaint(
         painter: AreasPainter(_selectedAreas),

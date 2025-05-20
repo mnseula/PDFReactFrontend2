@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'dart:io';
-import '../services/file_service.dart';
-import '../models/document_model.dart';
-import '../widgets/upload_widget.dart';
-import '../widgets/tool_selector.dart';
-import '../widgets/document_viewer/document_viewer.dart';
-import '../widgets/processing_form.dart';
+import 'package:document_processor/services/file_service.dart';
+import 'package:document_processor/models/document_model.dart';
+import 'package:document_processor/ui/widgets/upload_widget.dart';
+import 'package:document_processor/ui/widgets/tool_selector.dart';
+import 'package:document_processor/ui/widgets/document_viewer/document_viewer.dart';
+import 'package:document_processor/ui/widgets/processing_form.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -23,26 +23,12 @@ class _HomeScreenState extends State<HomeScreen> {
   final FileService _fileService = FileService();
 
   Future<void> _handleFileUpload() async {
-    File? file = await _fileService.pickDocument();
+    final file = await _fileService.pickDocument();
     if (file != null) {
-      // Determine document type based on extension
-      DocumentType type = DocumentType.unknown;
-      if (file.path.endsWith('.pdf')) {
-        type = DocumentType.pdf;
-      } else if (file.path.endsWith('.doc') || file.path.endsWith('.docx')) {
-        type = DocumentType.word;
-      } else if (file.path.endsWith('.xls') || file.path.endsWith('.xlsx')) {
-        type = DocumentType.excel;
-      } else if (file.path.endsWith('.ppt') || file.path.endsWith('.pptx')) {
-        type = DocumentType.powerpoint;
-      } else if (file.path.endsWith('.jpg') || file.path.endsWith('.jpeg') || file.path.endsWith('.png')) {
-        type = DocumentType.image;
-      }
-
-      // Create a Document object
-      Document document = Document(
+      final type = _getDocumentType(file.path);
+      final document = Document(
         name: file.path.split('/').last,
-        url: file.path, // For web, this might need to be a URL
+        url: file.path,
         type: type,
       );
 
@@ -52,6 +38,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  DocumentType _getDocumentType(String path) {
+    if (path.endsWith('.pdf')) return DocumentType.pdf;
+    if (path.endsWith('.doc') || path.endsWith('.docx')) return DocumentType.word;
+    if (path.endsWith('.xls') || path.endsWith('.xlsx')) return DocumentType.excel;
+    if (path.endsWith('.ppt') || path.endsWith('.pptx')) return DocumentType.powerpoint;
+    if (path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png')) return DocumentType.image;
+    return DocumentType.unknown;
+  }
 
   void _handleToolSelected(String tool) {
     setState(() {
@@ -60,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleProcessingStart() {
-    // Implement processing start logic
+    // TODO: Implement processing start logic
   }
 
   void _handleSignatureComplete(Uint8List signature) {
@@ -71,38 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Document Processor'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            UploadWidget(onPressed: _handleFileUpload),
-            if (_currentDocument != null)
-              ToolSelector(
-                onToolSelected: _handleToolSelected,
-                selectedTool: _selectedTool ?? '',
-              ),
-            if (_currentDocument != null && _selectedTool != null)
-              ProcessingForm(
-                document: _currentDocument!,
-                selectedTool: _selectedTool!,
-                onProcessingStart: _handleProcessingStart,
-              ),
-            if (_currentDocument != null)
-              Expanded(
-                child: DocumentViewer(
-                  document: _currentDocument!,
-                  onDocumentProcessed: (Document processedDocument) {
-                    // Handle processed document
-                  },
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
+    // TODO: Implement build method
+    return const Placeholder();
   }
 }

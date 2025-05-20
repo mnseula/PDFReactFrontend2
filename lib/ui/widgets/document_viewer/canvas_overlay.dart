@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/processing_options.dart';
+import 'package:document_processor/models/processing_options.dart';
 
 class CanvasOverlay extends StatefulWidget {
   final Function(RectangleArea) onAreaSelected;
@@ -89,29 +89,46 @@ class _CanvasPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw existing selected areas
-    final areaPaint = Paint()
+    final paint = Paint()
       ..color = Colors.blue.withOpacity(0.3)
       ..style = PaintingStyle.fill;
 
+    // Draw existing selections
     for (final area in selectedAreas) {
       canvas.drawRect(
-        Rect.fromLTRB(area.x1, area.y1, area.x2, area.y2),
-        areaPaint,
+        Rect.fromPoints(
+          Offset(area.x1, area.y1),
+          Offset(area.x2, area.y2),
+        ),
+        paint,
       );
     }
 
     // Draw current selection
     if (startPoint != null && endPoint != null) {
-      final currentPaint = Paint()
-        ..color = Colors.red.withOpacity(0.3)
-        ..style = PaintingStyle.fill;
-
-      final rect = Rect.fromPoints(startPoint!, endPoint!);
-      canvas.drawRect(rect, currentPaint);
+      canvas.drawRect(
+        _normalizeRect(startPoint!, endPoint!),
+        paint..color = Colors.blue.withOpacity(0.5),
+      );
     }
   }
 
+  Rect _normalizeRect(Offset start, Offset end) {
+    return Rect.fromPoints(
+      Offset(
+        start.dx < end.dx ? start.dx : end.dx,
+        start.dy < end.dy ? start.dy : end.dy,
+      ),
+      Offset(
+        start.dx > end.dx ? start.dx : end.dx,
+        start.dy > end.dy ? start.dy : end.dy,
+      ),
+    );
+  }
+
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(_CanvasPainter oldDelegate) =>
+      startPoint != oldDelegate.startPoint ||
+      endPoint != oldDelegate.endPoint ||
+      selectedAreas != oldDelegate.selectedAreas;
 }

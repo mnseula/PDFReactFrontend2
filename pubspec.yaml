@@ -11,15 +11,14 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  http: ^1.1.0
-  provider: ^6.1.1
-  syncfusion_flutter_pdfviewer: ^23.1.36
-  syncfusion_flutter_signaturepad: ^23.1.36
-  universal_html: ^2.2.1
-  flutter_pdfview: ^1.2.2
-  path_provider: ^2.1.1
-  file_picker: ^10.1.9
-  path: ^1.8.3
+  http: '>=1.1.0 <2.0.0'
+  provider: '>=6.1.1 <7.0.0'
+  syncfusion_flutter_pdfviewer: '>=23.1.36 <24.0.0'
+  syncfusion_flutter_signaturepad: '>=23.1.36 <24.0.0'
+  universal_html: '>=2.2.1 <3.0.0'
+  file_picker: '>=10.1.9 <11.0.0'
+  path: '>=1.8.3 <2.0.0'
+  url_strategy: ^0.2.0
 
 dev_dependencies:
   flutter_test:
