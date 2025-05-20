@@ -12,22 +12,19 @@ RUN useradd -m flutter
 USER flutter
 WORKDIR /home/flutter/app
 
-# 3. Configure Git to skip SSL verification (temporary)
-RUN git config --global http.sslVerify false
-
-# 4. Install Flutter (now with working SSL)
+# 3. Install Flutter (specific stable version)
 RUN git clone https://github.com/flutter/flutter.git -b stable /home/flutter/flutter
 ENV PATH="/home/flutter/flutter/bin:${PATH}"
 
-# 5. Re-enable SSL verification
-RUN git config --global http.sslVerify true
+# 4. Verify Flutter installation
+RUN flutter --version
 
-# 6. Copy project files
+# 5. Copy project files
 COPY --chown=flutter . .
 
-# 7. Build
+# 6. Build (removed --web-renderer flag)
 RUN flutter pub get && \
-    flutter build web --release --web-renderer html
+    flutter build web --release
 
 # Production stage
 FROM nginx:stable-alpine
