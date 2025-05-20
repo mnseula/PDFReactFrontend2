@@ -28,11 +28,13 @@ RUN flutter create pdf_viewer
 WORKDIR /home/flutter/app/pdf_viewer
 COPY --chown=flutter:flutter . .
 
-# Enable web platform and build
-RUN flutter config --enable-web
-RUN flutter create --platforms=web .
+# Clear flutter cache
 RUN flutter clean
+
+# Get dependencies and build
 RUN flutter pub get
+
+# Enable web platform and build
 RUN flutter build web --release
 
 # Production stage
