@@ -26,5 +26,5 @@ enum DocumentType {
   excel,
   powerpoint,
   image,
-  unknown
+  unknown,
 }
