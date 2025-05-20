@@ -23,8 +23,8 @@ class Document {
 enum DocumentType {
   pdf,
   word,
-  powerpoint,
   excel,
+  powerpoint,
   image,
-  other,
+  unknown
 }

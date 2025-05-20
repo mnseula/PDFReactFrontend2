@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import '../services/file_service.dart';
 import '../models/document_model.dart';
 import '../widgets/upload_widget.dart';
@@ -18,11 +19,38 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedTool;
   Uint8List? _signatureImage;
 
-  void _handleFileUpload(Document document) {
-    setState(() {
-      _currentDocument = document;
-    });
+  final FileService _fileService = FileService();
+
+  Future<void> _handleFileUpload() async {
+    File? file = await _fileService.pickDocument();
+    if (file != null) {
+      // Determine document type based on extension
+      DocumentType type = DocumentType.unknown;
+      if (file.path.endsWith('.pdf')) {
+        type = DocumentType.pdf;
+      } else if (file.path.endsWith('.doc') || file.path.endsWith('.docx')) {
+        type = DocumentType.word;
+      } else if (file.path.endsWith('.xls') || file.path.endsWith('.xlsx')) {
+        type = DocumentType.excel;
+      } else if (file.path.endsWith('.ppt') || file.path.endsWith('.pptx')) {
+        type = DocumentType.powerpoint;
+      } else if (file.path.endsWith('.jpg') || file.path.endsWith('.jpeg') || file.path.endsWith('.png')) {
+        type = DocumentType.image;
+      }
+
+      // Create a Document object
+      Document document = Document(
+        name: file.path.split('/').last,
+        url: file.path, // For web, this might need to be a URL
+        type: type,
+      );
+
+      setState(() {
+        _currentDocument = document;
+      });
+    }
   }
+
 
   void _handleToolSelected(String tool) {
     setState(() {
@@ -50,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const UploadWidget(),
+            UploadWidget(onPressed: _handleFileUpload),
             if (_currentDocument != null)
               ToolSelector(
                 onToolSelected: _handleToolSelected,

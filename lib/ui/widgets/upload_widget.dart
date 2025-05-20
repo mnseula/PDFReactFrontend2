@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class UploadWidget extends StatelessWidget {
-  const UploadWidget({super.key});
+  final VoidCallback onPressed;
+
+  const UploadWidget({Key? key, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        // TODO: Implement file upload
-      },
+      onPressed: onPressed,
       child: const Text('Upload Document'),
     );
   }
