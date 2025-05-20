@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import '../../models/document_model.dart';
 import '../../models/processing_options.dart';
 import '../canvas_overlay.dart';
 import '../drawing_pad.dart';
@@ -7,24 +8,34 @@ import '../drawing_pad.dart';
 class PdfViewer extends StatefulWidget {
   final Document document;
   final Function(Document) onDocumentProcessed;
+  final GlobalKey<PdfViewerState>? key;
 
   const PdfViewer({
-    super.key,
+    this.key,
     required this.document,
     required this.onDocumentProcessed,
-  });
+  }) : super(key: key);
 
   @override
-  State<PdfViewer> createState() => _PdfViewerState();
+  PdfViewerState createState() => PdfViewerState();
 }
 
-class _PdfViewerState extends State<PdfViewer> {
+class PdfViewerState extends State<PdfViewer> {
   final PdfViewerController _pdfViewerController = PdfViewerController();
   List<RectangleArea> _selectedAreas = [];
   bool _isDrawing = false;
   String? _currentAnnotationType;
   Uint8List? _signatureImage;
   int? _currentPageNumber;
+
+  void startSignatureProcess() {
+    setState(() {
+      _currentAnnotationType = 'signature';
+      _isDrawing = true;
+      _signatureImage = null;
+      _selectedAreas.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +63,7 @@ class _PdfViewerState extends State<PdfViewer> {
                     pageNumber: _currentPageNumber,
                   ));
                 });
-                
-                // If we're adding a signature and have an area selected
+
                 if (_currentAnnotationType == 'signature' && 
                     _selectedAreas.isNotEmpty && 
                     _signatureImage != null) {
@@ -80,8 +90,15 @@ class _PdfViewerState extends State<PdfViewer> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Signature captured. Now select where to place it.'),
+                    duration: Duration(seconds: 2),
                   ),
                 );
+              },
+              onCancel: () {
+                setState(() {
+                  _currentAnnotationType = null;
+                  _isDrawing = false;
+                });
               },
             ),
           ),
@@ -92,20 +109,21 @@ class _PdfViewerState extends State<PdfViewer> {
   Future<void> _addSignatureToPdf() async {
     if (_selectedAreas.isEmpty || _signatureImage == null) return;
 
-    try {
-      // Show loading indicator
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 10),
-              Text('Adding signature to document...'),
-            ],
-          ),
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 10),
+            Text('Adding signature to document...'),
+          ],
         ),
-      );
+        duration: Duration(seconds: 2),
+      ),
+    );
 
+    try {
       // Create annotation options
       final annotation = AnnotationOptions(
         type: AnnotationType.signature,
@@ -113,8 +131,7 @@ class _PdfViewerState extends State<PdfViewer> {
         signatureImage: base64Encode(_signatureImage!),
       );
 
-      // Here you would typically call your API to add the signature
-      // For example:
+      // In a real app, you would call your API here:
       // final processedDoc = await ApiService().processDocument(
       //   widget.document.id,
       //   ProcessingOptions(
@@ -132,23 +149,22 @@ class _PdfViewerState extends State<PdfViewer> {
         _signatureImage = null;
         _selectedAreas.clear();
         _currentAnnotationType = null;
+        _isDrawing = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Signature added successfully')),
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Signature added successfully'),
+          duration: Duration(seconds: 2),
+        ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add signature: $e')),
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('Failed to add signature: $e'),
+          duration: const Duration(seconds: 2),
+        ),
       );
     }
-  }
-
-  // Call this method when the "Signature" tool is selected from the toolbar
-  void startSignatureProcess() {
-    setState(() {
-      _currentAnnotationType = 'signature';
-      _isDrawing = true;
-    });
   }
 }
