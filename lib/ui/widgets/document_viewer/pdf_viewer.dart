@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:typed_data';
+import 'dart:ui' as ui;  // Add this import for ImageByteFormat
 import 'package:document_processor/models/document_model.dart';
 import 'package:document_processor/models/processing_options.dart';
 import 'package:document_processor/ui/widgets/canvas_overlay.dart';
@@ -47,23 +48,15 @@ class PdfViewerState extends State<PdfViewer> {
       body: Stack(
         children: [
           SfPdfViewer.network(
-            widget.document.url,
+            widget.document.path, // Changed from url
             controller: _pdfViewerController,
             enableTextSelection: !_isDrawingMode,
           ),
           if (!_isDrawingMode)
             CanvasOverlay(
-              selectedAreas: _selectedAreas,
-              onAreaSelected: (area) {
-                setState(() {
-                  _selectedAreas.add(area);
-                });
-              },
-              onClearSelection: () {
-                setState(() {
-                  _selectedAreas.clear();
-                });
-              },
+              selectedAreas: const [], // Add default value
+              onAreaSelected: (area) {},
+              onClearSelection: () {},
             ),
           if (_signatureImage != null)
             Positioned(

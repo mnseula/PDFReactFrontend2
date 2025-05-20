@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (file != null) {
       final type = _getDocumentType(file.path);
       final document = Document(
-        name: file.path.split('/').last,
-        url: file.path,
+        name: file.name,
+        path: file.path, // Changed from url
         type: type,
       );
 
@@ -67,5 +67,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // TODO: Implement build method
     return const Placeholder();
+  }
+}
+
+class FileService {
+  Future<File?> pickDocument() async {
+    return pickFile(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx']);
+  }
+
+  Future<File?> pickFile(List<String> allowedExtensions) async {
+    // TODO: Implement file picking logic
+    return null;
   }
 }

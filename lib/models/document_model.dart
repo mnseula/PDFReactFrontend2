@@ -86,16 +86,17 @@ class Document {
           thumbnailUrl == other.thumbnailUrl &&
           type == other.type;
 
+  // Replace hashValues with Object.hash
   @override
-  int get hashCode => hashValues(
-        id,
-        name,
-        path,
-        size,
-        uploadDate,
-        thumbnailUrl,
-        type,
-      );
+  int get hashCode => Object.hash(
+    id,
+    name,
+    path,
+    size,
+    uploadDate,
+    thumbnailUrl,
+    type,
+  );
 
   @override
   String toString() => 'Document(id: $id, name: $name, type: $type)';
