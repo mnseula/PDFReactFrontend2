@@ -16,8 +16,8 @@ class DrawingPad extends StatefulWidget {
 }
 
 class _DrawingPadState extends State<DrawingPad> {
-  // Fixed: Made GlobalKey const for web compatibility
-  static const _signaturePadKey = GlobalKey<SfSignaturePadState>();
+  // Solution: Initialize the key without const
+  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
