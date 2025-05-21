@@ -7,6 +7,9 @@ import 'package:document_processor/models/annotation_options.dart';
 import 'package:document_processor/ui/widgets/canvas_overlay.dart';
 import 'package:document_processor/ui/widgets/drawing_pad.dart';
 
+// Assuming RectangleArea is defined in annotation_options.dart
+typedef RectangleArea = AnnotationRectangleArea; // Or use the correct type
+
 class PdfViewer extends StatefulWidget {
   final Document document;
   final Function(Document) onDocumentProcessed;
@@ -54,7 +57,7 @@ class PdfViewerState extends State<PdfViewer> {
           ),
           if (!_isDrawingMode)
             CanvasOverlay(
-              onAreaSelected: (area) {
+              onAreaSelected: (RectangleArea area) { // Explicit type
                 setState(() {
                   _selectedAreas.add(area);
                 });
@@ -65,10 +68,10 @@ class PdfViewerState extends State<PdfViewer> {
                 });
               },
             ),
-          if (_signatureImage != null && _selectedAreas.isNotEmpty) // Added null check
+          if (_signatureImage != null && _selectedAreas.isNotEmpty)
             Positioned(
-              left: _selectedAreas.last.x1, // Removed lastOrNull
-              top: _selectedAreas.last.y1,  // Removed lastOrNull
+              left: _selectedAreas.last.x1,
+              top: _selectedAreas.last.y1,
               child: Image.memory(
                 _signatureImage!,
                 width: 100,
@@ -121,10 +124,7 @@ class PdfViewerState extends State<PdfViewer> {
       uploadDate: widget.document.uploadDate,
       thumbnailUrl: widget.document.thumbnailUrl,
       type: widget.document.type,
-      annotations: [
-        ...?widget.document.annotations, 
-        annotation
-      ],
+      annotations: [...?widget.document.annotations, annotation],
     );
     
     widget.onDocumentProcessed(processedDocument);

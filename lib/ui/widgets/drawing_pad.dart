@@ -1,54 +1,58 @@
-import 'package:flutter/material.dart';
 import 'dart:typed_data';
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
-class DrawingPad extends StatelessWidget {
+class DrawingPad extends StatefulWidget {
   final Function(Uint8List) onSignatureComplete;
-  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
-  
+
   const DrawingPad({
     super.key,
     required this.onSignatureComplete,
   });
 
-  Future<void> _handleSave() async {
-    final data = await _signaturePadKey.currentState!.toImage();
-    final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
-    if (bytes != null) {
-      onSignatureComplete(bytes.buffer.asUint8List());
-    }
-  }
+  @override
+  State<DrawingPad> createState() => _DrawingPadState();
+}
+
+class _DrawingPadState extends State<DrawingPad> {
+  // Fixed: Made GlobalKey const for web compatibility
+  static const _signaturePadKey = GlobalKey<SfSignaturePadState>();
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
+          width: 300,
           height: 200,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
           ),
           child: SfSignaturePad(
             key: _signaturePadKey,
             backgroundColor: Colors.white,
-            strokeColor: Colors.black,
-            minimumStrokeWidth: 1.0,
-            maximumStrokeWidth: 4.0,
           ),
         ),
-        const SizedBox(height: 8),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            ElevatedButton(
-              onPressed: () => _signaturePadKey.currentState?.clear(),
+            TextButton(
+              onPressed: () {
+                _signaturePadKey.currentState?.clear();
+              },
               child: const Text('Clear'),
             ),
-            ElevatedButton(
-              onPressed: _handleSave,
-              child: const Text('Save'),
+            TextButton(
+              onPressed: () async {
+                final image = await _signaturePadKey.currentState?.toImage();
+                final byteData = await image?.toByteData(format: ui.ImageByteFormat.png);
+                if (byteData != null) {
+                  widget.onSignatureComplete(byteData.buffer.asUint8List());
+                }
+              },
+              child: const Text('Done'),
             ),
           ],
         ),
