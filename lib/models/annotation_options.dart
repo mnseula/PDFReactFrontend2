@@ -1,6 +1,5 @@
 // lib/models/annotation_options.dart
 import 'dart:typed_data';
-import 'package:document_processor/models/annotation_options.dart';  // Not processing_options.dart
 
 class RectangleArea {
   final double x1;
