@@ -18,7 +18,7 @@ class Document {
   final DateTime uploadDate;
   final String? thumbnailUrl;
   final DocumentType type;
-  final List<AnnotationOptions>? annotations; // Add annotations
+  final List<AnnotationOptions>? annotations;
 
   const Document({
     required this.id,
@@ -64,6 +64,7 @@ class Document {
     DateTime? uploadDate,
     String? thumbnailUrl,
     DocumentType? type,
+    List<AnnotationOptions>? annotations,
   }) {
     return Document(
       id: id ?? this.id,
@@ -73,6 +74,7 @@ class Document {
       uploadDate: uploadDate ?? this.uploadDate,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       type: type ?? this.type,
+      annotations: annotations ?? this.annotations,
     );
   }
 
@@ -89,7 +91,6 @@ class Document {
           thumbnailUrl == other.thumbnailUrl &&
           type == other.type;
 
-  // Replace hashValues with Object.hash
   @override
   int get hashCode => Object.hash(
     id,
