@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:typed_data';
-import 'dart:ui' as ui;  // Add this import for ImageByteFormat
+import 'dart:ui' as ui;
 import 'package:document_processor/models/document_model.dart';
-import 'package:document_processor/models/processing_options.dart';
+import 'package:document_processor/models/annotation_options.dart';
 import 'package:document_processor/ui/widgets/canvas_overlay.dart';
 import 'package:document_processor/ui/widgets/drawing_pad.dart';
 
@@ -65,10 +65,10 @@ class PdfViewerState extends State<PdfViewer> {
                 });
               },
             ),
-          if (_signatureImage != null)
+          if (_signatureImage != null && _selectedAreas.isNotEmpty) // Added null check
             Positioned(
-              left: _selectedAreas.lastOrNull?.x1 ?? 0,
-              top: _selectedAreas.lastOrNull?.y1 ?? 0,
+              left: _selectedAreas.last.x1, // Removed lastOrNull
+              top: _selectedAreas.last.y1,  // Removed lastOrNull
               child: Image.memory(
                 _signatureImage!,
                 width: 100,
@@ -105,22 +105,27 @@ class PdfViewerState extends State<PdfViewer> {
   }
 
   void _processAnnotations() {
+    if (_selectedAreas.isEmpty && _signatureImage == null) return;
+
     final annotation = AnnotationOptions(
       type: AnnotationType.signature,
       signatureData: _signatureImage,
       area: _selectedAreas.isNotEmpty ? _selectedAreas.last : null,
     );
     
-  final processedDocument = Document(
-    id: widget.document.id,
-    name: widget.document.name,
-    path: widget.document.path,
-    size: widget.document.size,
-    uploadDate: widget.document.uploadDate,
-    thumbnailUrl: widget.document.thumbnailUrl,
-    type: widget.document.type,
-    annotations: [...?widget.document.annotations, annotation],
-  );
+    final processedDocument = Document(
+      id: widget.document.id,
+      name: widget.document.name,
+      path: widget.document.path,
+      size: widget.document.size,
+      uploadDate: widget.document.uploadDate,
+      thumbnailUrl: widget.document.thumbnailUrl,
+      type: widget.document.type,
+      annotations: [
+        ...?widget.document.annotations, 
+        annotation
+      ],
+    );
     
     widget.onDocumentProcessed(processedDocument);
   }
