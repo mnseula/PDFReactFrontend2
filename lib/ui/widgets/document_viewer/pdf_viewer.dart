@@ -6,8 +6,9 @@ import 'package:document_processor/models/document_model.dart';
 import 'package:document_processor/models/annotation_options.dart';
 import 'package:document_processor/ui/widgets/canvas_overlay.dart';
 import 'package:document_processor/ui/widgets/drawing_pad.dart';
+
 // At the top of the file, after imports
-export 'package:document_processor/models/annotation_options.dart' show RectangleArea;
+import 'package:document_processor/models/geometry/rectangle_area.dart';
 
 class PdfViewer extends StatefulWidget {
   final Document document;
@@ -56,11 +57,12 @@ class PdfViewerState extends State<PdfViewer> {
           ),
           if (!_isDrawingMode)
             CanvasOverlay(
-              onAreaSelected: (RectangleArea area) {
-                setState(() {
-                  _selectedAreas.add(area);
-                });
-              },
+            // Change the onAreaSelected callback to:
+            onAreaSelected: (RectangleArea area) {  // Explicit type
+              setState(() {
+                _selectedAreas.add(area);
+              });
+            },
               onClearSelection: () {
                 setState(() {
                   _selectedAreas.clear();

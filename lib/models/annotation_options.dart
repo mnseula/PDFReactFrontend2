@@ -1,5 +1,8 @@
 // lib/models/annotation_options.dart
 import 'dart:typed_data';
+import 'package:document_processor/models/geometry/rectangle_area.dart';
+// Remove the RectangleArea class from this file
+// Keep the rest of the file exactly as is
 
 class RectangleArea {
   final double x1;

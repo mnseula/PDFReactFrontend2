@@ -1,4 +1,7 @@
 import 'dart:typed_data';
+import 'package:document_processor/models/geometry/rectangle_area.dart';
+// Replace any existing RectangleArea definition with the imported one
+// Keep all other code that uses RectangleArea
 
 enum AnnotationType {
   signature,

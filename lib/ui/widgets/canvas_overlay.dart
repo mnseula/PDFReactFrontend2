@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:document_processor/models/processing_options.dart';
+import 'package:document_processor/models/geometry/rectangle_area.dart';
+
+typedef OnAreaSelected = void Function(RectangleArea area);
 
 class CanvasOverlay extends StatefulWidget {
   final Function(RectangleArea) onAreaSelected;
