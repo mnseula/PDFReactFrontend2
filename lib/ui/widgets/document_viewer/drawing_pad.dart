@@ -6,7 +6,8 @@ import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 class DrawingPad extends StatelessWidget {
   final Function(Uint8List) onSignatureComplete;
-  final GlobalKey<SfSignaturePadState> _signaturePadKey = const GlobalKey();
+  // Make GlobalKey const
+  static final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
 
   const DrawingPad({
     super.key,

@@ -17,6 +17,7 @@ class Document {
   final DateTime uploadDate;
   final String? thumbnailUrl;
   final DocumentType type;
+  final List<AnnotationOptions>? annotations; // Add annotations
 
   const Document({
     required this.id,
@@ -26,6 +27,7 @@ class Document {
     required this.uploadDate,
     this.thumbnailUrl,
     required this.type,
+    this.annotations,
   });
 
   factory Document.fromJson(Map<String, dynamic> json) {

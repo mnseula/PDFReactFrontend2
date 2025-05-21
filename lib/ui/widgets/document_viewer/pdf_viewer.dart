@@ -111,12 +111,16 @@ class PdfViewerState extends State<PdfViewer> {
       area: _selectedAreas.isNotEmpty ? _selectedAreas.last : null,
     );
     
-    final processedDocument = Document(
-      name: widget.document.name,
-      path: widget.document.path,
-      type: widget.document.type,
-      annotations: [...?widget.document.annotations, annotation],
-    );
+  final processedDocument = Document(
+    id: widget.document.id,
+    name: widget.document.name,
+    path: widget.document.path,
+    size: widget.document.size,
+    uploadDate: widget.document.uploadDate,
+    thumbnailUrl: widget.document.thumbnailUrl,
+    type: widget.document.type,
+    annotations: [...?widget.document.annotations, annotation],
+  );
     
     widget.onDocumentProcessed(processedDocument);
   }
