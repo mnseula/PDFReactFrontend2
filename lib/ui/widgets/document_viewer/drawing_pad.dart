@@ -4,15 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
-class DrawingPad extends StatelessWidget {
+class DrawingPad extends StatefulWidget {
   final Function(Uint8List) onSignatureComplete;
-  // Make GlobalKey const
-  static final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
 
   const DrawingPad({
     super.key,
     required this.onSignatureComplete,
   });
+
+  @override
+  State<DrawingPad> createState() => _DrawingPadState();
+}
+
+class _DrawingPadState extends State<DrawingPad> {
+  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,7 @@ class DrawingPad extends StatelessWidget {
                 final image = await _signaturePadKey.currentState?.toImage();
                 final byteData = await image?.toByteData(format: ui.ImageByteFormat.png);
                 if (byteData != null) {
-                  onSignatureComplete(byteData.buffer.asUint8List());
+                  widget.onSignatureComplete(byteData.buffer.asUint8List());
                 }
               },
               child: const Text('Done'),

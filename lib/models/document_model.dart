@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:document_processor/models/annotation_options.dart';
 
 enum DocumentType {
   pdf,
