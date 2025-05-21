@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 
 class DrawingPad extends StatelessWidget {
   final Function(Uint8List) onSignatureComplete;
-  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
+  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
   
   const DrawingPad({
     super.key,

@@ -113,7 +113,7 @@ class PdfViewerState extends State<PdfViewer> {
     
     final processedDocument = Document(
       name: widget.document.name,
-      url: widget.document.url,
+      path: widget.document.path,
       type: widget.document.type,
       annotations: [...?widget.document.annotations, annotation],
     );
