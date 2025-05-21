@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 class DrawingPad extends StatefulWidget {
@@ -17,7 +16,6 @@ class DrawingPad extends StatefulWidget {
 }
 
 class _DrawingPadState extends State<DrawingPad> {
-  // Changed to late initialization
   final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
 
   @override
