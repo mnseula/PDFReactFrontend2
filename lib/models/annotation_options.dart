@@ -1,12 +1,5 @@
 // lib/models/annotation_options.dart
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
-
-enum AnnotationType {
-  signature,
-  highlight,
-  redaction,
-}
 
 class RectangleArea {
   final double x1;
@@ -22,6 +15,12 @@ class RectangleArea {
   });
 }
 
+enum AnnotationType {
+  signature,
+  highlight,
+  redaction,
+}
+
 class AnnotationOptions {
   final AnnotationType type;
   final Uint8List? signatureData;
@@ -32,10 +31,4 @@ class AnnotationOptions {
     this.signatureData,
     this.area,
   });
-
-  Map<String, dynamic> toJson() => {
-    'type': type.toString(),
-    'signatureData': signatureData,
-    'area': area,
-  };
 }
