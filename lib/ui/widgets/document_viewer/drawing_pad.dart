@@ -17,7 +17,8 @@ class DrawingPad extends StatefulWidget {
 }
 
 class _DrawingPadState extends State<DrawingPad> {
-  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
+  // Changed to late initialization
+  late final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
 
   @override
   Widget build(BuildContext context) {
